@@ -1,0 +1,3 @@
+/home/wiktoria/Desktop/Thesis/HelloWorld/CMakeFiles/ExampleProject.dir
+/home/wiktoria/Desktop/Thesis/HelloWorld/CMakeFiles/edit_cache.dir
+/home/wiktoria/Desktop/Thesis/HelloWorld/CMakeFiles/rebuild_cache.dir
