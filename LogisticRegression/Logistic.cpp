@@ -5,49 +5,54 @@
 #include <shark/Algorithms/Trainers/LogisticRegression.h> // Assuming the provided code is in this header file
 
 using namespace shark;
+using namespace std;
 
 int main() {
-    // Create a synthetic classification dataset
-    ClassificationDataset dataset;
-    dataset.shuffle();
-    size_t numFeatures = 4; // Number of input features
-    size_t numClasses = 2;  // Number of classes (binary classification in this case)
-    
-    // Load data from CSV file (assuming you have a CSV file with features and labels)
+    // Load training data from CSV file (assuming you have a CSV file with features)
     Data<RealVector> data;
-    Data<unsigned int> labels;
     importCSV(data, "iris.csv");
+    //std::cout << data.numberOfElements() << " training examples" << std::endl;
+
+    // Load labels from CSV file (assuming you have a CSV file with labels)
+    Data<unsigned int> labels;
     importCSV(labels, "iris_labels.csv");
-    
-    // Split the data into training and test sets
-    size_t numDataPoints = data.numberOfElements();
-    size_t trainSize = 0.8 * numDataPoints; // 80% for training, 20% for testing
-    size_t testSize = numDataPoints - trainSize;
-    
-    // Split the data and labels into training and test sets
-    ClassificationDataset trainingData = createLabeledDataFromRange(data.elements().begin(), data.elements().begin() + trainSize, labels.elements().begin(), numClasses);
-    ClassificationDataset testData = createLabeledDataFromRange(data.elements().begin() + trainSize, data.elements().end(), labels.elements().begin() + trainSize, numClasses);
-    
+    //std::cout << labels.numberOfElements() << " labels" << std::endl;
+
+    // Load test data from CSV file (assuming you have a CSV file with test features)
+    Data<RealVector> testData;
+    importCSV(testData, "iris_test.csv");
+
+    size_t numFeatures = 4; // Number of input features
+    size_t numClasses = 2; // Number of classes (binary classification in this case)
+
     // Create a logistic regression model
-    LinearClassifier<RealVector> logisticModel(numFeatures, numClasses);
-    LogisticRegression<RealVector> logisticTrainer;
-    
+    LinearClassifier<RealVector> logisticModel(numFeatures, numClasses - 1); // numClasses - 1 for binary classification
+
+    // Create a training dataset from the loaded data
+    ClassificationDataset trainingData(data, labels);
+
     // Train the logistic regression model using the training data
+    LogisticRegression<RealVector> logisticTrainer(100); // Perform 100 iterations
     logisticTrainer.train(logisticModel, trainingData);
-    
+
     // Evaluate the model on the test data
-    Data<RealVector> testInputs = testData.inputs();
-    Data<unsigned int> testLabels = testData.labels();
-    Data<unsigned int> predictedLabels = logisticModel(testInputs);
+    Data<unsigned int> predictedLabels = logisticModel(testData);
+
+    // Calculate the number of test data points
+    size_t numTestDataPoints = testData.numberOfElements();
+
+    // Load test labels from CSV file (assuming you have a CSV file with test labels)
+    Data<unsigned int> testLabels;
+    importCSV(testLabels, "iris_test_labels.csv");
 
     // Calculate the accuracy of the model on the test data
     size_t correctPredictions = 0;
-    for (size_t i = 0; i < testSize; ++i) {
+    for (size_t i = 0; i < numTestDataPoints; ++i) {
         if (predictedLabels.element(i) == testLabels.element(i))
             correctPredictions++;
     }
 
-    double accuracy = static_cast<double>(correctPredictions) / testSize;
+    double accuracy = static_cast<double>(correctPredictions) / numTestDataPoints;
     std::cout << "Accuracy on test data: " << accuracy << std::endl;
 
     return 0;
