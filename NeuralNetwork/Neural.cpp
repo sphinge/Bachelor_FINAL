@@ -74,6 +74,7 @@ int main(int argc, char **argv)
     }
     std::size_t hidden1 = 200;
     std::size_t hidden2 = 100;
+    //std::size_t hidden3 = 100;
     std::size_t iterations = 1000;
     std::size_t batchSize = 256;
 
@@ -87,8 +88,10 @@ int main(int argc, char **argv)
 
     DenseLayer layer1(data.inputShape(), hidden1);
     DenseLayer layer2(layer1.outputShape(), hidden2);
+    //DenseLayer layer3(layer2.outputShape(), hidden3);
     LinearModel<RealVector> output(layer2.outputShape(), numClasses);
     auto network = layer1 >> layer2 >> output;
+    //auto network = layer1 >> output;
 
     CrossEntropy<unsigned int, RealVector> loss;
     ErrorFunction<RealVector> error(data, &network, &loss, true);
@@ -96,6 +99,7 @@ int main(int argc, char **argv)
     std::cout << "training network" << std::endl;
     initRandomNormal(network, 0.001);
     Adam<RealVector> optimizer;
+    optimizer.setEta(0.0001);
     error.init();
     optimizer.init(error);
 
@@ -104,7 +108,7 @@ int main(int argc, char **argv)
     std::vector<double> accuracyVec;
 
     for (std::size_t i = 0; i != iterations; ++i) {
-        std::cout << "iteration " << i << std::endl;
+        std::cout << "i " << i << std::endl;
         optimizer.step(error);
         iterationsVec.push_back(i + 1);
         errorVec.push_back(optimizer.solution().value);

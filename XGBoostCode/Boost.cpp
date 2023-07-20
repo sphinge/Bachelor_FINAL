@@ -1,37 +1,82 @@
-#include <xgboost/c_api.h>
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <string>
+#include <xgboost/c_api.h>
+
+struct IrisData {
+    std::vector<std::vector<float>> features;
+    std::vector<int> class_labels; // Change the class_labels type to int
+};
+
+IrisData loadIrisData(const std::string& filename) {
+    IrisData iris_data;
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filename << std::endl;
+        return iris_data;
+    }
+
+    std::string line;
+    while (std::getline(file, line)) {
+        std::vector<float> row_features;
+        std::istringstream iss(line);
+        std::string value;
+
+        // Read the four feature values (sepal_length, sepal_width, petal_length, petal_width)
+        for (int i = 0; i < 4; i++) {
+            if (!std::getline(iss, value, ',')) {
+                std::cerr << "Error reading feature value from line: " << line << std::endl;
+                file.close();
+                return iris_data;
+            }
+            row_features.push_back(std::stof(value));
+        }
+
+        // Read the class label (species)
+        if (!std::getline(iss, value, ',')) {
+            std::cerr << "Error reading class label from line: " << line << std::endl;
+            file.close();
+            return iris_data;
+        }
+        iris_data.class_labels.push_back(std::stoi(value)); // Convert label to int
+        iris_data.features.push_back(row_features);
+    }
+
+    file.close();
+    return iris_data;
+}
+
 
 int main() {
-    // Create the train data
-    int cols = 3, rows = 5;
-    float train[rows][cols];
-    for (int i = 0; i < rows; i++)
-        for (int j = 0; j < cols; j++)
-            train[i][j] = (i + 1) * (j + 1);
+    // Load Iris dataset from CSV
+    IrisData training_data = loadIrisData("iris.csv");
+    IrisData test_data = loadIrisData("iris_test.csv");
 
-    float train_labels[rows];
-    for (int i = 0; i < rows; i++)
-        train_labels[i] = 1 + i * i * i;
+    // Check if the data was loaded successfully for training data
+    if (training_data.features.empty() || training_data.class_labels.empty() ||
+        training_data.features[0].size() != 4 || training_data.features.size() != training_data.class_labels.size()) {
+        std::cerr << "Error loading training Iris dataset." << std::endl;
+        return 1;
+    }
 
-    // Convert to DMatrix
+    // Convert training data to DMatrix
     DMatrixHandle h_train[1];
-    XGDMatrixCreateFromMat((float *)train, rows, cols, -1, &h_train[0]);
+    XGDMatrixCreateFromMat((float*)training_data.features.data(), training_data.features.size(), 4, -1, &h_train[0]);
 
-    // Load the labels
-    XGDMatrixSetFloatInfo(h_train[0], "label", train_labels, rows);
+    // Convert the class labels to unsigned int
+    std::vector<unsigned int> uint_class_labels(training_data.class_labels.begin(), training_data.class_labels.end());
 
-    // Read back the labels, just a sanity check
-    bst_ulong bst_result;
-    const float *out_floats;
-    XGDMatrixGetFloatInfo(h_train[0], "label", &bst_result, &out_floats);
-    for (unsigned int i = 0; i < bst_result; i++)
-        std::cout << "label[" << i << "]=" << out_floats[i] << std::endl;
+    // Load the labels for training data
+    XGDMatrixSetUIntInfo(h_train[0], "label", uint_class_labels.data(), uint_class_labels.size());
 
     // Create the booster and load some parameters
     BoosterHandle h_booster;
     XGBoosterCreate(h_train, 1, &h_booster);
     XGBoosterSetParam(h_booster, "booster", "gbtree");
-    XGBoosterSetParam(h_booster, "objective", "reg:linear");
+    XGBoosterSetParam(h_booster, "objective", "multi:softmax"); // Set the objective function for multi-class classification
+    XGBoosterSetParam(h_booster, "num_class", "3"); // Set the number of classes (3 classes: 0, 1, 2)
     XGBoosterSetParam(h_booster, "max_depth", "5");
     XGBoosterSetParam(h_booster, "eta", "0.1");
     XGBoosterSetParam(h_booster, "min_child_weight", "1");
@@ -43,20 +88,16 @@ int main() {
     for (int iter = 0; iter < 200; iter++)
         XGBoosterUpdateOneIter(h_booster, iter, h_train[0]);
 
-    // Predict
-    const int sample_rows = 5;
-    float test[sample_rows][cols];
-    for (int i = 0; i < sample_rows; i++)
-        for (int j = 0; j < cols; j++)
-            test[i][j] = (i + 1) * (j + 1);
+    // Convert test data to DMatrix
     DMatrixHandle h_test;
-    XGDMatrixCreateFromMat((float *)test, sample_rows, cols, -1, &h_test);
-    bst_ulong out_len;
-    const float *f;
+    XGDMatrixCreateFromMat((float*)test_data.features.data(), test_data.features.size(), 4, -1, &h_test);
+    bst_ulong out_len = 0;
+    const float *f = nullptr;
     XGBoosterPredict(h_booster, h_test, 0, 0, 0, &out_len, &f);
 
+    // Print the predictions for the test data
     for (unsigned int i = 0; i < out_len; i++)
-        std::cout << "prediction[" << i << "]=" << f[i] << std::endl;
+        std::cout << "prediction[" << i << "]=" << static_cast<int>(f[i]) << std::endl; // Convert the output to int
 
     // Free XGBoost internal structures
     XGDMatrixFree(h_train[0]);
