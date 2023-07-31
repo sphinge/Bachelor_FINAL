@@ -8,11 +8,11 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/wiktoria/Desktop/Thesis/LogisticRegression/Logistic.cpp" "CMakeFiles/Logistic.dir/Logistic.cpp.o" "gcc" "CMakeFiles/Logistic.dir/Logistic.cpp.o.d"
+  "/home/mayag88/Documents/Code/new_bachelor/LogisticRegression/Logistic.cpp" "CMakeFiles/Logistic.dir/Logistic.cpp.o" "gcc" "CMakeFiles/Logistic.dir/Logistic.cpp.o.d"
   )
 
-# Targets to which this target links.
-set(CMAKE_TARGET_LINKED_INFO_FILES
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_LINKED_INFO_FILES
   )
 
 # Fortran module output directory.

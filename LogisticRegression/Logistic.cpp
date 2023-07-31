@@ -12,11 +12,24 @@ int main() {
     Data<RealVector> data;
     importCSV(data, "iris.csv");
     //std::cout << data.numberOfElements() << " training examples" << std::endl;
+    // Data<RealVector> features = data;
+
+    // // Print the data
+    // std::cout << "Printing Data<RealVector> object:" << std::endl;
+    // for (std::size_t i = 0; i < features.numberOfElements(); ++i)
+    // {
+    //     std::cout << "Data point " << i + 1 << ": ";
+    //     for (std::size_t j = 0; j < features.element(i).size(); ++j)
+    //     {
+    //         std::cout << features.element(i)[j] << " ";
+    //     }
+    //     std::cout << std::endl;
+    // }
 
     // Load labels from CSV file (assuming you have a CSV file with labels)
     Data<unsigned int> labels;
     importCSV(labels, "iris_labels.csv");
-    //std::cout << labels.numberOfElements() << " labels" << std::endl;
+    // std::cout << labels.numberOfElements() << " labels" << std::endl;
 
     // Load test data from CSV file (assuming you have a CSV file with test features)
     Data<RealVector> testData;
@@ -26,13 +39,14 @@ int main() {
     size_t numClasses = 2; // Number of classes (binary classification in this case)
 
     // Create a logistic regression model
-    LinearClassifier<RealVector> logisticModel(numFeatures, numClasses - 1); // numClasses - 1 for binary classification
-
+    // LinearClassifier<RealVector> logisticModel(numFeatures, numClasses ); // numClasses - 1 for binary classification
+    // LogisticRegression<> logisticModel(0, 0, true, 1.e-8);
+    LinearClassifier<> logisticModel;
     // Create a training dataset from the loaded data
     ClassificationDataset trainingData(data, labels);
 
     // Train the logistic regression model using the training data
-    LogisticRegression<RealVector> logisticTrainer(100); // Perform 100 iterations
+    LogisticRegression<RealVector> logisticTrainer; // Perform 100 iterations
     logisticTrainer.train(logisticModel, trainingData);
 
     // Evaluate the model on the test data
