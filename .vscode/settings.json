@@ -1,11 +1,12 @@
 {
     "files.associations": {
-        "fstream": "cpp",
-        "iostream": "cpp",
         "iosfwd": "cpp",
+        "cmath": "cpp",
+        "sstream": "cpp",
+        "iostream": "cpp",
         "cctype": "cpp",
         "clocale": "cpp",
-        "cmath": "cpp",
+        "csetjmp": "cpp",
         "csignal": "cpp",
         "cstdarg": "cpp",
         "cstddef": "cpp",
@@ -57,6 +58,7 @@
         "type_traits": "cpp",
         "utility": "cpp",
         "slist": "cpp",
+        "fstream": "cpp",
         "future": "cpp",
         "initializer_list": "cpp",
         "iomanip": "cpp",
@@ -68,7 +70,7 @@
         "ostream": "cpp",
         "semaphore": "cpp",
         "shared_mutex": "cpp",
-        "sstream": "cpp",
+        "span": "cpp",
         "stdexcept": "cpp",
         "stop_token": "cpp",
         "streambuf": "cpp",
@@ -78,7 +80,8 @@
         "typeinfo": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "*.ipp": "cpp",
-        "csetjmp": "cpp"
-    }
+        "gvc.h": "c",
+        "*.ipp": "cpp"
+    },
+    "ros.distro": "humble"
 }
