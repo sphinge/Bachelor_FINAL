@@ -390,10 +390,14 @@ const int EXCHANGES = 100; // N is the number of times the exchange happens
 
 int main() {
 
+    //create file for plotting
+    ofstream metrics_file("plots/training_metrics.csv");
+    metrics_file << "Epoch,Loss,Accuracy\n";
+
     vector<vector<float>> X; // Features
     vector<vector<float>> Y; // Labels
 
-    ifstream file("iris_test.csv"); //TODO: CHANGE IRIS TEST HAS 10 SAMPLES 
+    ifstream file("data/iris_test.csv"); 
     string line, value;
 
     while (getline(file, line))
@@ -422,7 +426,7 @@ int main() {
     vector<vector<float>> X_test; // Features
     vector<vector<float>> Y_test; // Labels
 
-    ifstream test_file("iris_test.csv");
+    ifstream test_file("data/iris_test.csv");
     string line_test, value_test;
 
     while (getline(test_file, line_test))
@@ -481,6 +485,9 @@ int main() {
             accuracy += accuracy_i;
 
             printf("Epoch %d, loss: %.4f, accuracy per iter: %.2f%%\n", i + 1, loss, accuracy_i * 100);
+
+            // Write to the metrics file
+            metrics_file << i + 1 << "," << loss << "," << accuracy_i * 100 << "\n";
         }
 
         std::string updated_network_str = networkClient.serialize() + "\n";

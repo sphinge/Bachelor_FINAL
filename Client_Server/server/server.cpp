@@ -373,7 +373,7 @@ namespace http {
 
         for (int i = 0; i < num_clients; i++) 
         {
-            log("====== Waiting for client " + to_string(i+1) + "======\n");
+            log("\n====== Waiting for client " + to_string(i+1) + "======\n");
             client_sockets[i] = acceptConnection();
             log(std::to_string(i+1) + ": client connected");
         }
