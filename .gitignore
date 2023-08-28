@@ -2,3 +2,5 @@
 Client_Server/server/server
 Client_Server/plots/training_metrics.csv
 Client_Server/client/client
+
+Neural_Perceptron/*
