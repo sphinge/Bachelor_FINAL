@@ -45,12 +45,12 @@ vector<float> softmax(vector<float> &z)
     float max_val = *max_element(z.begin(), z.end());
     vector<float> exp_values(z.size());
     float sum_exp = 0.0;
-    for (unsigned int i= 0; i < z.size(); i++)
+    for (unsigned int i = 0; i < z.size(); i++)
     {
         exp_values[i] = exp(z[i] - max_val);
         sum_exp += exp_values[i];
     }
-    for (unsigned int i= 0; i < z.size(); i++)
+    for (unsigned int i = 0; i < z.size(); i++)
     {
         exp_values[i] /= sum_exp;
     }
@@ -60,7 +60,7 @@ vector<float> softmax(vector<float> &z)
 float cross_entropy_loss(vector<float> &y, vector<float> &y_hat)
 {
     float loss = 0.0;
-    for (unsigned int i= 0; i < y.size(); i++)
+    for (unsigned int i = 0; i < y.size(); i++)
     {
         loss -= y[i] * log(y_hat[i] + 1e-9);
     }
@@ -90,7 +90,7 @@ public:
     {
         x = _x;
         float z = bias;
-        for (unsigned int i= 0; i < nInputs; ++i)
+        for (unsigned int i = 0; i < nInputs; ++i)
             z += x[i] * weights[i];
         y = isHidden ? relu(z) : (z);
         return y;
@@ -109,15 +109,15 @@ public:
     void update_weights(float dC_dy)
     {
         float dC_dz = dC_dy * dy_dz();
-        
-        for (unsigned int i= 0; i < nInputs; ++i)
+
+        for (unsigned int i = 0; i < nInputs; ++i)
         {
             float dz_dw = x[i];
             float dC_dw = dC_dz * dz_dw;
-            
+
             // L2 regularization
-            dC_dw += LAMBDA * weights[i]; 
-            
+            dC_dw += LAMBDA * weights[i];
+
             weights[i] -= LEARNING_RATE * dC_dw;
         }
 
@@ -125,7 +125,6 @@ public:
         float dC_db = dC_dz * dz_db;
         bias -= LEARNING_RATE * dC_db;
     }
-
 };
 
 class Layer
@@ -138,7 +137,7 @@ public:
     Layer(int _iLayer, int _nInputs, int _nNeurons, bool isHidden = true)
         : iLayer(_iLayer), nInputs(_nInputs), nNeurons(_nNeurons)
     {
-        for (unsigned int i= 0; i < nNeurons; ++i)
+        for (unsigned int i = 0; i < nNeurons; ++i)
             neurons.push_back(Neuron(iLayer, i, nInputs, isHidden));
     }
 
@@ -154,7 +153,7 @@ public:
     {
         dC_dy = _dC_dy;
         vector<float> dC_dy__prevLayer(nInputs, 0);
-        for (unsigned int i= 0; i < nInputs; ++i)
+        for (unsigned int i = 0; i < nInputs; ++i)
         {
             for (unsigned int j = 0; j < neurons.size(); ++j)
                 dC_dy__prevLayer[i] += dC_dy[j] * neurons[j].dy_dz() * neurons[j].weights[i];
@@ -189,89 +188,109 @@ public:
     vector<float> feed(vector<float> &_x)
     {
         vector<float> x = _x;
-        for (unsigned int i= 0; i < layers.size(); i++)
+        for (unsigned int i = 0; i < layers.size(); i++)
         {
             x = layers[i].forward(x);
         }
         return softmax(x); // Applying softmax here
     }
 
-    vector<vector<float>> getWeights() const{
+    vector<vector<float>> getWeights() const
+    {
         vector<vector<float>> all_weights;
-        for (const auto &layer : layers) {
-            for (auto &neuron : layer.neurons) {
+        for (const auto &layer : layers)
+        {
+            for (auto &neuron : layer.neurons)
+            {
                 all_weights.push_back(neuron.weights);
             }
         }
         return all_weights;
     }
 
-
-    void setWeights(const vector<vector<float>>& weights) {
+    void setWeights(const vector<vector<float>> &weights)
+    {
         int counter = 0;
-        for (auto &layer : layers) {
-            for (auto &neuron : layer.neurons) {
+        for (auto &layer : layers)
+        {
+            for (auto &neuron : layer.neurons)
+            {
                 neuron.weights = weights[counter++];
             }
         }
     }
 
-    vector<float> getBiases() const {
+    vector<float> getBiases() const
+    {
         vector<float> all_biases;
-        for (const auto &layer : layers) {
-            for (auto &neuron : layer.neurons) {
+        for (const auto &layer : layers)
+        {
+            for (auto &neuron : layer.neurons)
+            {
                 all_biases.push_back(neuron.bias);
             }
         }
         return all_biases;
     }
 
-    void setBiases(const vector<float>& biases) {
+    void setBiases(const vector<float> &biases)
+    {
         int counter = 0;
-        for (auto &layer : layers) {
-            for (auto &neuron : layer.neurons) {
+        for (auto &layer : layers)
+        {
+            for (auto &neuron : layer.neurons)
+            {
                 neuron.bias = biases[counter++];
             }
         }
     }
 
-    std::string serialize() const {
+    std::string serialize() const
+    {
         std::ostringstream oss;
 
         auto weights = getWeights();
-        for (const auto& neuronWeights : weights) {
-            for (float weight : neuronWeights) {
+        for (const auto &neuronWeights : weights)
+        {
+            for (float weight : neuronWeights)
+            {
                 oss << weight << " ";
             }
         }
 
         auto biases = getBiases();
-        for (float bias : biases) {
+        for (float bias : biases)
+        {
             oss << bias << " ";
         }
 
         std::string result = oss.str();
-        if (!result.empty()) {
+        if (!result.empty())
+        {
             result.pop_back(); // Remove the last space
         }
 
         return result;
     }
 
-    void deserialize(const std::string& serialized) {
+    void deserialize(const std::string &serialized)
+    {
         std::istringstream iss(serialized);
 
         std::vector<float> allValues;
         float value;
-        while (iss >> value) {
+        while (iss >> value)
+        {
             allValues.push_back(value);
         }
 
         std::vector<std::vector<float>> weights = getWeights();
         size_t index = 0;
 
-        for (auto& neuronWeights : weights) {
-            for (size_t j = 0; j < neuronWeights.size(); ++j) {
+        for (auto &neuronWeights : weights)
+        {
+            for (size_t j = 0; j < neuronWeights.size(); ++j)
+            {
                 neuronWeights[j] = allValues[index++];
             }
         }
@@ -279,13 +298,13 @@ public:
         setWeights(weights);
 
         std::vector<float> biases;
-        while (index < allValues.size()) {
+        while (index < allValues.size())
+        {
             biases.push_back(allValues[index++]);
         }
 
         setBiases(biases);
     }
-
 };
 
 float trainOneSample(Network &network, vector<float> &x, vector<float> &y)
@@ -293,10 +312,10 @@ float trainOneSample(Network &network, vector<float> &x, vector<float> &y)
     vector<float> y_hat = network.feed(x); // Now y_hat directly has softmax applied values
 
     vector<float> dC_dlogits = vector<float>(y.size());
-    for (unsigned int i= 0; i < y.size(); ++i)
+    for (unsigned int i = 0; i < y.size(); ++i)
         dC_dlogits[i] = y_hat[i] - y[i];
 
-    for ( int i= network.layers.size() - 1; i >= 0; --i)
+    for (int i = network.layers.size() - 1; i >= 0; --i)
     {
         dC_dlogits = network.layers[i].backward(dC_dlogits);
         network.layers[i].update_weights();
@@ -316,7 +335,7 @@ float trainOneEpoch(Network &network, vector<vector<float>> &X, vector<vector<fl
     auto rng = std::default_random_engine{};
     std::shuffle(indices.begin(), indices.end(), rng);
 
-    for (unsigned int i: indices)
+    for (unsigned int i : indices)
     {
         float error = trainOneSample(network, X[i], Y[i]);
         total_loss += error;
@@ -347,39 +366,42 @@ float computeAccuracy(Network &network, vector<vector<float>> &X, vector<vector<
     return (float)correctPredictions / X.size();
 }
 
-
-
-namespace {
+namespace
+{
     const int BUFFER_SIZE = 30720;
 
-    void log(const std::string& message) {
+    void log(const std::string &message)
+    {
         std::cout << message << std::endl;
     }
 
-    void exitWithError(const std::string& errorMessage) {
+    void exitWithError(const std::string &errorMessage)
+    {
         perror(errorMessage.c_str()); // perror will print the system error message
         exit(1);
     }
 
 };
 
-std::string receiveWithDynamicBuffering(int &sock) {
+std::string receiveWithDynamicBuffering(int &sock)
+{
     char buffer[BUFFER_SIZE] = {0};
     std::string accumulator;
 
-
-    while (true) {
+    while (true)
+    {
         int bytesReceived = recv(sock, buffer, BUFFER_SIZE, 0);
-        if (bytesReceived < 0) {
+        if (bytesReceived < 0)
+        {
             exitWithError("Failed to receive bytes from server socket connection");
         }
-        
-        accumulator += std::string(buffer, bytesReceived);
 
+        accumulator += std::string(buffer, bytesReceived);
 
         // Example: Assuming a "\n" as the end-of-message delimiter.
         // You can use any unique delimiter consistent between the server and the client.
-        if (accumulator.find("\n") != std::string::npos) {
+        if (accumulator.find("\n") != std::string::npos)
+        {
             break;
         }
     }
@@ -388,9 +410,10 @@ std::string receiveWithDynamicBuffering(int &sock) {
 
 const int EXCHANGES = 100; // N is the number of times the exchange happens
 
-int main() {
+int main()
+{
 
-    //create file for plotting
+    // create file for plotting
     ofstream metrics_file("plots/training_metrics.csv");
     metrics_file << "Epoch,Loss,Accuracy\n";
 
@@ -406,7 +429,7 @@ int main() {
         vector<float> features;
 
         // Read first 4 values as features
-        for (unsigned int i= 0; i < 4; ++i)
+        for (unsigned int i = 0; i < 4; ++i)
         {
             getline(ss, value, ',');
             features.push_back(stod(value));
@@ -435,7 +458,7 @@ int main() {
         vector<float> features;
 
         // Read first 4 values as features
-        for (unsigned int i= 0; i < 4; ++i)
+        for (unsigned int i = 0; i < 4; ++i)
         {
             getline(ss_test, value_test, ',');
             features.push_back(stod(value_test));
@@ -453,33 +476,39 @@ int main() {
     test_file.close();
 
     int clientSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (clientSocket == -1) {
+    if (clientSocket == -1)
+    {
         exitWithError("Cannot create socket");
     }
 
     struct sockaddr_in serverAddress;
     serverAddress.sin_family = AF_INET;
-    serverAddress.sin_port = htons(8080);  // Assuming the server is running on port 8080
+    serverAddress.sin_port = htons(8080); // Assuming the server is running on port 8080
     serverAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-    if (connect(clientSocket, (struct sockaddr*) &serverAddress, sizeof(serverAddress)) == -1) {
+    if (connect(clientSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1)
+    {
         exitWithError("Failed to connect to server");
-    } else {
+    }
+    else
+    {
         log("Connection established.");
     }
 
-    for (int exchange = 0; exchange < EXCHANGES; ++exchange) {
-        log("\n\n--------------EXCHANGE: " + to_string(exchange+1) + "--------------------\n\n");
+    for (int exchange = 0; exchange < EXCHANGES; ++exchange)
+    {
+        log("\n\n--------------EXCHANGE: " + to_string(exchange + 1) + "--------------------\n\n");
         log("Waiting for model...\n");
         std::string received_str = receiveWithDynamicBuffering(clientSocket);
-        //log("Received network from server: " + received_str + "\n");
+        // log("Received network from server: " + received_str + "\n");
         log("Received network from server.\n");
 
-        Network networkClient({4,8,3});  // Initialize with an empty structure. Will be updated by deserialize.
+        Network networkClient({4, 8, 3}); // Initialize with an empty structure. Will be updated by deserialize.
         networkClient.deserialize(received_str);
 
         float accuracy = 0.0;
-        for (unsigned int i= 0; i < NEPOCH; ++i) {
+        for (unsigned int i = 0; i < NEPOCH; ++i)
+        {
             float loss = trainOneEpoch(networkClient, X, Y);
             float accuracy_i = computeAccuracy(networkClient, X_test, Y_test);
             accuracy += accuracy_i;
@@ -492,10 +521,11 @@ int main() {
 
         std::string updated_network_str = networkClient.serialize() + "\n";
 
-        //log("Sending network to server: " + updated_network_str + "\n");
+        // log("Sending network to server: " + updated_network_str + "\n");
         log("Sending network to server: \n");
 
-        if (send(clientSocket, updated_network_str.c_str(), updated_network_str.length(), 0) < 0) {
+        if (send(clientSocket, updated_network_str.c_str(), updated_network_str.length(), 0) < 0)
+        {
             exitWithError("Failed to send network to server");
         }
     }
