@@ -408,7 +408,7 @@ std::string receiveWithDynamicBuffering(int &sock)
     return accumulator;
 }
 
-const int EXCHANGES = 100; // N is the number of times the exchange happens
+const int EXCHANGES = 10; // N is the number of times the exchange happens
 
 int main()
 {
@@ -420,7 +420,7 @@ int main()
     vector<vector<float>> X; // Features
     vector<vector<float>> Y; // Labels
 
-    ifstream file("data/iris_test.csv"); 
+    ifstream file("data/iris.csv"); 
     string line, value;
 
     while (getline(file, line))

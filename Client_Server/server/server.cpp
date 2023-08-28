@@ -385,7 +385,7 @@ namespace http {
         sendNetworkUpdateToClients(serializedGlobalModel);
 
         // Let's assume a constant for the number of exchanges
-        const int EXCHANGES = 99;
+        const int EXCHANGES = 9;
         for (int iteration = 0; iteration < EXCHANGES; ++iteration) 
         {
             log("\n\n--------------EXCHANGE: " + to_string(iteration+2) + "--------------------\n\n");
