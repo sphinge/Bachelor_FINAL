@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+
+# C++
+*.out
+*.obj
+
+# CSV files
+*.csv
+
+# Compiled files (add more as needed)
+*.o
+*.a
+*.so
+*.dll
+*.exe
+
