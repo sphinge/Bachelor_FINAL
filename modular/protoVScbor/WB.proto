@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+message WeightsBiases {
+  repeated float w1 = 1;
+  repeated float b1 = 2;
+  repeated float w2 = 3;
+  repeated float b2 = 4;
+}
